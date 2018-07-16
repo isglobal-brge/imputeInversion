@@ -1,0 +1,53 @@
+Manual imputeinversion
+
+Arguments
+  -d,--data
+Data to be imputed. The input of this argument should be the name of the files to be analysed (without the extension).
+If the files are: ecrhs.bed ecrhs.bim ecrhs.fam; then this argument should be used as follows: 
+-d colorectal
+  
+  -i,--inversions
+Indicate the inversion regions for which we want the imputed data (the output of the program will be a VCF file with imputed data of the region(s) that we indicate in this argument.
+      Valid inputs (in hg19):
+         - Coordinates.
+               -i 8:8055789-11980649
+         - Name of the inversion.
+               -i inv8p23.1
+         - Text file with the regions of interest. 
+               -i genomic_regions.txt
+           The separators in the text file can be ' ', ':', '-', '\t'. 
+
+
+
+The following three examples would be valid:
+7:54290974-54386821    7   54290974   54386821    7 54290974 54386821
+8:8055789-11980649     8   8055789   11980649     8 8055789 11980649
+17:43661775-44372665   17   43661775   44372665   17 43661775 44372665 
+       
+
+- All / ALL / all. This option will impute all the inversions available at the scoreInvHap package (-h,--help shows the availabe inversions)
+               -i All
+ 
+  -t,--threads
+Integer (by default set to 1). Number of threads that will be used in SHAPEIT and Minimac3. From SHAPEIT user guide: "If there are 1,000 individuals in the dataset, SHAPEIT using 4 threads will phase 4 individuals simultaneously conditional upon the 1000 - 4 = 996 others individuals. It allows to divide the running time of SHAPEIT by almost 4 in this case, so 4 hours becomes 1! This option is recommended only if you have a large number of individuals in your dataset. Note that using a number of threads bigger than the number of available cores will not further decrease the running times."
+  
+  -h,--help,*
+        Shows the Usage, displays help
+        
+        
+Needed files
+  - Data preparation
+Imputation preparation perl script and reference for the script (McCarthy Group Tools) (can be downloaded here: http://www.well.ox.ac.uk/~wrayner/tools/)
+
+  - Phasing (SHAPEIT)
+The file below for each of the chromosomes of interest (example shown for chr 8)
+genetic_map_chr8_combined_b37.txt (can be downloaded here: http://mathgen.stats.ox.ac.uk/impute/1000GP_Phase3/)
+  
+  - Imputation (Minimac3)
+The file below for each of the chromosomes of interest (example shown for chr 8)
+ALL.chr8.phase3_v5.shapeit2_mvncall_integrated.noSingleton.genotypes.vcf.gz (can be downloaded here: https://genome.sph.umich.edu/wiki/Minimac3#Reference_Panels_for_Download)
+  
+  - Postimputation
+  	File with all the SNP IDs (rs numbers)
+All_20180418.vcf.gz (might be necessary to unzip it and bgzip it to be able to use BCFtools without problems) (can be downloaded here:
+ftp://ftp.ncbi.nih.gov/snp/organisms/human_9606/VCF/)  
