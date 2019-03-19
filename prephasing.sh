@@ -20,7 +20,9 @@ prephase(){
 
 	
 	## Create files for imputation (Imputation preparation)
-	mkdir $prefix/prephasing_files # Folder to store all the files generated during pre-phasing process
+	if [ ! -d $prefix/prephasing_files]; then
+		mkdir $prefix/prephasing_files # Folder to store all the files generated during pre-phasing process
+	fi
 
 
 	plink --bfile $data --freq --out $data # Generate freq file
