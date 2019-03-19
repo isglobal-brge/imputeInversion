@@ -4,8 +4,8 @@
 # Prephase data
 # Arguments:
 #   $1: path to PLINK data
-#	  $2: names of chromosomes to process
-#	  $3: References file for SNP testing
+#	$2: names of chromosomes to process
+#	$3: References file for SNP testing
 # Returns:
 #   None
 #######################################
@@ -13,7 +13,7 @@ prephase(){
 	
 	data=$1
 	unique_chr=$2
-	ref=$3
+	ref=`echo $3`
 	
 	prefix=`dirname $data`
 	path=`dirname "${BASH_SOURCE[0]}"`
