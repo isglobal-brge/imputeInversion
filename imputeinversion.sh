@@ -1,24 +1,33 @@
 #!/bin/bash
 
+## Exit if any line fails
+set -e
+
+
+## Load scripts
+path=`dirname "${BASH_SOURCE[0]}"`
+source $path/prephasing.sh
+
+## Load config file
+source $path/config
 
 # Define usage(). It will show the options of the function and the valid inputs when the user introduces a wrong option, does not introduce a necessary input or uses the -h|--help for help
-usage() { echo -e "\nUsage: $0 \t[-d,--data <Files name without extension (format must be PLINK - bed/bim/fam)>]\n\t\t\t\t[-i,--inversions <File containing inversion ranges | Inversion range | Inversion name | 'All'>]\n\t\t\t\t[-t,--threads <Integer. Number of threads to be used while phasing with SHAPEIT and while imputing with Minimac3>]\n\t\t\t\t[-k,--keep-files <Intermediate files created during the process will be removed by default. In order to keep them,\n\t\t\t\tindicate it writing 'Yes', 'YES' or 'yes'>]\n\t\t\t\t[-h,--help <Shows this message>]\n\nValid inversion names: ${SORTEDKEYS[@]}\n" 1>&2; exit 1; }
+usage() { echo -e "\nUsage: $0 \n\n\t-d,--data <FileName>\n\t\tFile name without extension (format must be PLINK - bed/bim/fam)\n\n\t-i,--inversions <File> \n\t\tFile containing inversion ranges | Inversion range | Inversion name | 'All'\n\n\t--family <Yes/No>\n\t\tIndicator for family relatedness\n\n\t--threads <Integer>\n\t\tNumber of threads to be used while phasing with SHAPEIT and while imputing with Minimac3\n\n\t-k,--keep-files <Yes/No>\n\t\tIntermediate files will be removed by default. To keep them, write 'Yes', 'YES' or 'yes'\n\n\t-h,--help \n\t\tShows this message\n\nValid inversion names: ${SORTEDKEYS[@]}\n" 1>&2; exit 1; }
 
 # Define an associative array between the inversion names and their ranges
-declare -A RANGES=( ["inv8p23.1"]="8:8055789-11980649" ["inv17q21.31"]="17:43661775-44372665" ["inv7p11.2"]="7:54290974-54386821" ["invXq13.2"]="X:72215927-72306774" 
+declare -A RANGES=( ["inv8_001"]="8:8055789-11980649" ["inv17_007"]="17:43661775-44372665" ["inv7_005"]="7:54290974-54386821" ["invX_006"]="X:72215927-72306774" 
                     ["inv12_004"]="12:47290470-47309756" ["inv7_011"]="7:70426185-70438879" ["inv7_003"]="7:31586765-31592019" ["inv11_001"]="11:41162296-41167044" 
                     ["inv2_013"]="2:139004949-139009203" ["inv6_006"]="6:130848198-130852318" ["inv3_003"]="3:162545362-162547641" ["inv7_014"]="7:151010030-151012107" 
-                    ["inv11_004"]="11:66018563-66019946" ["inv1_008"]="1:197756784-197757982" ["inv16_017"]="16:85188639-85189823" ["inv21_005"]="21:28020653-28021711" 
-                    ["inv12_006"]="12:71532784-71533816" ["inv6_002"]="6:31009222-31010095" ["inv14_005"]="14:65842304-65843165" ["inv1_004"]="1:92131841-92132615" 
+                    ["inv11_004"]="11:66018563-66019946" ["inv1_008"]="1:197756784-197757982" ["inv21_005"]="21:28020653-28021711" ["inv12_006"]="12:71532784-71533816" 
+					["inv6_002"]="6:31009222-31010095" ["inv14_005"]="14:65842304-65843165" ["inv1_004"]="1:92131841-92132615" 
                     ["inv2_002"]="2:33764554-33765272" )
 
 # Define the reverse associative array above, to use the names of the inversions in the ouput files                    
-declare -A REVRANGES=( ["8:8055789-11980649"]="inv8p23.1" ["17:43661775-44372665"]="inv17q21.31" ["7:54290974-54386821"]="inv7p11.2" ["X:72215927-72306774"]="invXq13.2" 
+declare -A REVRANGES=( ["8:8055789-11980649"]="inv8_001" ["17:43661775-44372665"]="inv17_007" ["7:54290974-54386821"]="inv7_005" ["X:72215927-72306774"]="invX_006" 
                        ["12:47290470-47309756"]="inv12_004" ["7:70426185-70438879"]="inv7_011" ["7:31586765-31592019"]="inv7_003" ["11:41162296-41167044"]="inv11_001" 
                        ["2:139004949-139009203"]="inv2_013" ["6:130848198-130852318"]="inv6_006" ["3:162545362-162547641"]="inv3_003" ["7:151010030-151012107"]="inv7_014" 
-                       ["11:66018563-66019946"]="inv11_004" ["1:197756784-197757982"]="inv1_008" ["16:85188639-85189823"]="inv16_017" ["21:28020653-28021711"]="inv21_005" 
-                       ["12:71532784-71533816"]="inv12_006" ["6:31009222-31010095"]="inv6_002" ["14:65842304-65843165"]="inv14_005" ["1:92131841-92132615"]="inv1_004" 
-                       ["2:33764554-33765272"]="inv2_002" )
+                       ["11:66018563-66019946"]="inv11_004" ["1:197756784-197757982"]="inv1_008" ["21:28020653-28021711"]="inv21_005" ["12:71532784-71533816"]="inv12_006" 
+					   ["6:31009222-31010095"]="inv6_002" ["14:65842304-65843165"]="inv14_005" ["1:92131841-92132615"]="inv1_004" ["2:33764554-33765272"]="inv2_002" )
 
 # Define array with the keys of the RANGES associative array                    
 KEYS=(${!RANGES[@]})
@@ -43,6 +52,11 @@ case $key in
     ;;
     -t|--threads)
     cpus="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    --family)
+    family="$2"
     shift # past argument
     shift # past value
     ;;
@@ -141,6 +155,13 @@ fi
 
 unique_chr=( $(echo "${chr[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' ') ) # Create an array with uniques chromosome numbers, this will be used for prephasing and phasing (there are more than one inversion in some chromosomes) 
 
+## Relatedness between samples
+if [[ -z "$family" ]] # If no relatedness was set ($family empty)
+then
+  echo -e "\n Samples are not family related\n\n"
+else
+  echo -e "\n Some of the samples are family related\n\n"
+fi
 
 ## Number of threads (By default: $cpus = 1)
 if [[ -z "$cpus" ]] # If the number of threads to use is not set by the user ($cpus empty)
@@ -152,36 +173,18 @@ then
   echo -e "\nInput for number of threads not valid. Value set to 1" # Show a message indicating that this value is set to one
   cpus=1 # Set to one the number of threads to be used by the program
 fi
+echo -e "Prephasing starting\n\n"
+prephase $data $unique_chr $HRCref
+. ~/data/software/imputeInversion-master/prephasing_v3.sh # Call the prephasing script to proceed with the process keeping the variables
+. ~/data/software/imputeInversion-master/phasing_shapeit_v2.sh # Call the phasing script (keeping the variables)
+. ~/data/software/imputeInversion-master/minimac3_imputation_v3.sh # Call imputation script (keeping the variables)
+. ~/data/software/imputeInversion-master/postimputation_v2.sh # Call imputation script (keeping the variables)
 
-
-
-. prephasing.sh # Call the prephasing script to proceed with the process (keeping the variables)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# By default, the intermediate files will be deleted
+if [[ -z "$keep_files" ]] || [[ $keep_files != Yes ]] && [[ $keep_files != YES ]] && [[ $keep_files != yes ]] # If user did not indicate 'YES' to keep the intermediate files 
+then
+  rm -rf prephasing_files # Remove folder containing pre-phasing files (remove files at this point to avoid having to many files at the end of the process if we want to impute all the chromosomes and cause potential memory problems) 
+  rm -rf phased_files # Remove folder containing phased files 
+  rm -rf pimputed_files # Remove folder containing imputed files
+  rm -rf postimputation_files # Remove folder containing postimputed files (intermediate files between the imputed ones and the final ones with the correct ids)
+fi
