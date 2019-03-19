@@ -15,7 +15,7 @@ prephase(){
 	unique_chr=$2
 	ref=$3
 	
-	$prefix=`dirname $data`
+	prefix=`dirname $data`
 	path=`dirname "${BASH_SOURCE[0]}"`
 
 	
