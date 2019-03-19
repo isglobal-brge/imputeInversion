@@ -9,7 +9,7 @@
 # Returns:
 #   None
 #######################################
-prephasing(){
+prephase(){
 	
 	data=$1
 	unique_chr=$2
