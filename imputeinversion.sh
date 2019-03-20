@@ -7,6 +7,9 @@ set -e
 ## Load scripts
 path=`dirname "${BASH_SOURCE[0]}"`
 source $path/prephasing.sh
+source $path/phasing_shapeit.sh
+source $path/minimac3_imputation.sh
+source $path/postimputation.sh
 
 ## Load config file
 source $path/config
@@ -159,6 +162,7 @@ unique_chr=( $(echo "${chr[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' ') ) # Creat
 if [[ -z "$family" ]] # If no relatedness was set ($family empty)
 then
   echo -e "\n Samples are not family related\n\n"
+  family="NO"
 else
   echo -e "\n Some of the samples are family related\n\n"
 fi
@@ -179,10 +183,21 @@ prefix=`dirname $data`
 base=`basename $data`
 
 prephase $data $unique_chr $HRCref 
-. ~/data/software/imputeInversion-master/prephasing_v3.sh # Call the prephasing script to proceed with the process keeping the variables
-. ~/data/software/imputeInversion-master/phasing_shapeit_v2.sh # Call the phasing script (keeping the variables)
-. ~/data/software/imputeInversion-master/minimac3_imputation_v3.sh # Call imputation script (keeping the variables)
-. ~/data/software/imputeInversion-master/postimputation_v2.sh # Call imputation script (keeping the variables)
+
+echo "Start phasing"
+if [ ! -d $prefix/phased_files ]; then
+  mkdir $prefix/phased_files # Folder to store all the files generated during phasing process
+fi 
+
+## Apply phasing to each chromosome
+for i in ${unique_chr[@]} # For each single chromosome 
+do
+  prephase $i $prefix $base $refsFolder $cpus $family
+done  
+
+#. ~/data/software/imputeInversion-master/phasing_shapeit_v2.sh # Call the phasing script (keeping the variables)
+#. ~/data/software/imputeInversion-master/minimac3_imputation_v3.sh # Call imputation script (keeping the variables)
+#. ~/data/software/imputeInversion-master/postimputation_v2.sh # Call imputation script (keeping the variables)
 
 # By default, the intermediate files will be deleted
 if [[ -z "$keep_files" ]] || [[ $keep_files != Yes ]] && [[ $keep_files != YES ]] && [[ $keep_files != yes ]] # If user did not indicate 'YES' to keep the intermediate files 

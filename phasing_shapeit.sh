@@ -1,45 +1,74 @@
 #!/bin/bash
 
-
-mkdir phased_files # Folder to store all the files generated during phasing process
-
-for i in ${unique_chr[@]} # For each single chromosome 
-do
-  mkdir phased_files/${i} # Create file with the chromosome number to store the files separated by chromosomes
-  if [[ $i == X ]] # If it is the chromosome X
-  then
-    # Run SHAPEIT to phase chromosome X (specifying the '--chrX' flag). SHAPEIT will phase female individuals and will set NA to haploid heterozygous males
-    shapeit -B prephasing_files/${i}/${i}_${data}_filtered \
-          -M ~/data/PublicData/REFERENCES/reference_panels/genetic_map_chrX_nonPAR_combined_b37.txt \
-          -O phased_files/${i}/${i}_${data}_filtered_phased \
-          --chrX \
-          --thread $cpus
-    # Convert output files from SHAPEIT (.haps) to vcf format      
-    shapeit -convert \
-          --input-haps phased_files/${i}/${i}_${data}_filtered_phased \
-          --output-vcf phased_files/${i}/${i}_${data}_filtered_phased.vcf
-  else
-    # Run SHAPEIT to phase the chromosome (no need to indicate anything else, just the input file containing a single chromosome)
-    shapeit -B prephasing_files/${i}/${i}_${data}_filtered \
-          -M ~/data/PublicData/REFERENCES/reference_panels/genetic_map_chr${i}_combined_b37.txt \
-          -O phased_files/${i}/${i}_${data}_filtered_phased \
-          --thread $cpus
-    # Convert output files from SHAPEIT (.haps) to vcf format    
-    shapeit -convert \
-          --input-haps phased_files/${i}/${i}_${data}_filtered_phased \
-          --output-vcf phased_files/${i}/${i}_${data}_filtered_phased.vcf
+#######################################
+# Phase data shapeit
+# Arguments:
+#	  $1: Chromosome to be phased
+#   $2: folder path
+#   $3: base name
+#   $4: path for shapeit reference
+#   $5: number of CPUs used in shapeit
+#   $6: family argument
+# Returns:
+#   None
+#######################################
+phase(){
+  
+  chr=$1
+  prefix=$2
+  base=$3
+  ShapeRef=$4
+  cpus=$5
+  family=$6
+  
+  if [ ! -d $prefix/phased_files/$chr ]; then
+    mkdir $prefix/phased_files/$chr # Create file with the chromosome number to store the files separated by chromosomes
   fi
-done 
-
-mv shapeit_* phased_files/ # Move shapeit .log files to the phased_files folder (to keep all the files in the same folder in case the user wants to keep the intermediate files)
-
-# By default, the intermediate files will be deleted
-if [[ -z "$keep_files" ]] || [[ $keep_files != Yes ]] && [[ $keep_files != YES ]] && [[ $keep_files != yes ]] # If user did not indicate 'YES' to keep the intermediate files 
-then
-  rm -rf prephasing_files # Remove folder containing pre-phasing files (remove files at this point to avoid having to many files at the end of the process if we want to impute all the chromosomes and cause potential memory problems) 
-fi
-
-. minimac3_imputation.sh # Call imputation script (keeping the variables)
-
-
-
+  if [[ $chr == X ]] # If it is the chromosome X
+    then
+      # Run SHAPEIT to phase chromosome X (specifying the '--chrX' flag). SHAPEIT will phase female individuals and will set NA to haploid heterozygous males
+      shapeit -B $prefix/prephasing_files/$chr/$chr_${base}_filtered \
+            -M $ShapeRef/genetic_map_chrX_nonPAR_combined_b37.txt \
+            -O $prefix/phased_files/$chr/$chr_${base}_filtered_phased \
+            --chrX \
+            --thread $cpus
+      # Convert output files from SHAPEIT (.haps) to vcf format      
+      shapeit -convert \
+            --input-haps $prefix/phased_files/${chr}/${chr}_${base}_filtered_phased \
+            --output-vcf $prefix/phased_files/${chr}/${chr}_${base}_filtered_phased.vcf
+    else
+      # Run SHAPEIT to phase the chromosome (no need to indicate anything else, just the input file containing a single chromosome)
+      if  [[ $family == No ]] && [[ $family == NO ]] && [[ $family == no ]] #If user indicated no relatedness
+      then
+           echo -e "Performing shapeit with NO relatedness"
+           shapeit -B $prefix/prephasing_files/${chr}/${chr}_${base}_filtered \
+  	      -M $ShapeRef/genetic_map_chr${chr}_combined_b37.txt \
+  	      -O $prefix/phased_files/${chr}/${chr}_1Mv3_filtered_phased \
+  	      --thread $cpus
+      # Convert output files from SHAPEIT (.haps) to vcf format
+           shapeit -convert \
+            --input-haps $prefix/phased_files/${chr}/${chr}_${base}_filtered_phased \
+            --output-vcf $prefix/phased_files/${chr}/${chr}_${base}_filtered_phased.vcf
+      elif [[ $family == Yes ]] || [[ $family == YES ]] || [[ $family == yes ]]
+      then
+           echo -e "Performing shapeit taking into account relatedness"
+  	     shapeit -B $prefix/prephasing_files/${chr}/${chr}_${base}_filtered \
+             -M $ShapeRef/genetic_map_chr${chr}_combined_b37.txt \
+             --duohmm \
+             -W 5 \
+             --force \
+             -O $prefix/phased_files/${chr}/${chr}_${base}_filtered_phased \
+             --thread $cpus \
+           # Convert output files from SHAPEIT (.haps) to vcf format
+           shapeit -convert \
+             --input-haps $prefix/phased_files/${chr}/${chr}_${base}_filtered_phased \
+             --output-vcf $prefix/phased_files/${chr}/${chr}_${base}_filtered_phased.vcf 
+      else
+          echo -e "Shapeit stopped due to unknown family parameter"
+          exit		
+      fi
+    fi
+  done
+  
+  mv $prefix/shapeit_* $prefix/phased_files/ # Move shapeit .log files to the phased_files folder (to keep all the files in the same folder in case the user wants to keep the intermediate files)
+}
