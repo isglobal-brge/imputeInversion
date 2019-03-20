@@ -199,8 +199,6 @@ if [ ! -d $dir/phased_files/shapeit ]; then
   mkdir $dir/phased_files/shapeit #to store all shapeit intermediate files
 fi
 
-mv $dir/phased_files/shapeit_* $dir/phased_files/shapeit/
-
 if [ ! -d $dir/pimputed_files ]; then
   mkdir $dir/pimputed_files # Folder to store all the files generated during phasing process
 fi
