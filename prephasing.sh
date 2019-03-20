@@ -45,21 +45,21 @@ prephase(){
 	  then
 		# Select chromosome '23' and fitler it: --geno filters out all variants with missing call rates exceeding the provided value (0.05 to avoid problems with SHAPEIT) to be removed, while --mind does the same for samples
 		plink --bfile $prefix/prephasing_files/${data}_updated \
-			--reference-allele $prefix/Force-Allele1-$data-1000G.txt \
+			--reference-allele $prefix/Force-Allele1-$base-1000G.txt \
 			--make-bed \
 			--mind 0.05 \
 			--geno 0.05 \
 			--chr 23 \
-			--out $prefix/prephasing_files/${i}/${i}_${data}_filtered
+			--out $prefix/prephasing_files/${i}/${i}_${base}_filtered
 	  else
 		# Separate chromosome $i and fitler it: --geno filters out all variants with missing call rates exceeding the provided value (0.05 to avoid problems with SHAPEIT) to be removed, while --mind does the same for samples
-		plink --bfile $prefix/prephasing_files/${data}_updated \
-			--reference-allele $prefix/Force-Allele1-$data-1000G.txt \
+		plink --bfile $prefix/prephasing_files/${base}_updated \
+			--reference-allele $prefix/Force-Allele1-$base-1000G.txt \
 			--make-bed \
 			--mind 0.05 \
 			--geno 0.05 \
 			--chr $i \
-			--out $prefix/prephasing_files/${i}/${i}_${data}_filtered
+			--out $prefix/prephasing_files/${i}/${i}_${base}_filtered
 	  fi
 	done  
 
