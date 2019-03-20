@@ -68,7 +68,5 @@ phase(){
           exit		
       fi
     fi
-  done
-  
-  mv $prefix/shapeit_* $prefix/phased_files/ # Move shapeit .log files to the phased_files folder (to keep all the files in the same folder in case the user wants to keep the intermediate files)
+    mv $prefix/shapeit_* $prefix/phased_files/ # Move shapeit .log files to the phased_files folder (to keep all the files in the same folder in case the user wants to keep the intermediate files)
 }
