@@ -1,15 +1,11 @@
 #!/bin/bash
 
-## Exit if any line fails
-set -e
-
-
 ## Load scripts
 path=`dirname "${BASH_SOURCE[0]}"`
 source $path/prephasing.sh
 source $path/phasing_shapeit.sh
 source $path/minimac3_imputation.sh
-#source $path/postimputation.sh
+source $path/postimputation.sh
 
 ## Load config file
 source $path/config
@@ -203,23 +199,27 @@ if [ ! -d $dir/pimputed_files ]; then
   mkdir $dir/pimputed_files # Folder to store all the files generated during phasing process
 fi
 
+if [ ! -d $dir/postimputation_files ]; then
+  mkdir $dir/postimputation_files # Folder to store all the files generated during the postimputation process
+fi
+
+if [ ! -d $dir/${base}_imputed_files ]; then
+  mkdir $dir/${base}_imputed_files # Folder to store the final files (this one will NOT be removed)
+fi
+
 ## Apply imputation and post-imputation to each inversion
 counter=0 # Start counter (will be used for the files names, starting and ending positions for each imputation)
 for i in ${chr[@]}
 do
   impute $i $dir $base ${prefix[$counter]} ${start[$counter]} ${end[$counter]} $refsFolder $cpus
-  postimputation
+  postimpute $i $dir $base ${prefix[$counter]} $cpus $annotRef
 done
-
-#. ~/data/software/imputeInversion-master/phasing_shapeit_v2.sh # Call the phasing script (keeping the variables)
-#. ~/data/software/imputeInversion-master/minimac3_imputation_v3.sh # Call imputation script (keeping the variables)
-#. ~/data/software/imputeInversion-master/postimputation_v2.sh # Call imputation script (keeping the variables)
 
 # By default, the intermediate files will be deleted
 if [[ -z "$keep_files" ]] || [[ $keep_files != Yes ]] && [[ $keep_files != YES ]] && [[ $keep_files != yes ]] # If user did not indicate 'YES' to keep the intermediate files 
 then
-  rm -rf prephasing_files # Remove folder containing pre-phasing files (remove files at this point to avoid having to many files at the end of the process if we want to impute all the chromosomes and cause potential memory problems) 
-  rm -rf phased_files # Remove folder containing phased files 
-  rm -rf pimputed_files # Remove folder containing imputed files
-  rm -rf postimputation_files # Remove folder containing postimputed files (intermediate files between the imputed ones and the final ones with the correct ids)
+  rm -rf $dir/prephasing_files # Remove folder containing pre-phasing files (remove files at this point to avoid having to many files at the end of the process if we want to impute all the chromosomes and cause potential memory problems) 
+  rm -rf $dir/phased_files # Remove folder containing phased files 
+  rm -rf $dir/pimputed_files # Remove folder containing imputed files
+  rm -rf $dir/postimputation_files # Remove folder containing postimputed files (intermediate files between the imputed ones and the final ones with the correct ids)
 fi

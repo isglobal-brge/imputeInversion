@@ -1,5 +1,8 @@
 #!/bin/bash
 
+## Stop on an error
+set -e
+
 #######################################
 # Impute data with minimac
 # Arguments:
