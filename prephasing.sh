@@ -40,7 +40,9 @@ prephase(){
 
 	for i in ${unique_chr[@]} # For each single chromosome 
 	do
-	  mkdir $prefix/prephasing_files/${i} # Create file with the chromosome number to store the files separated by chromosomes
+		if [ ! -d $prefix/prephasing_files/${i} ]; then
+		  	  mkdir $prefix/prephasing_files/${i}  # Create file with the chromosome number to store the files separated by chromosomes
+	  fi
 	  if [[ $i == X ]] # If it is the chromosome X
 	  then
 		# Select chromosome '23' and fitler it: --geno filters out all variants with missing call rates exceeding the provided value (0.05 to avoid problems with SHAPEIT) to be removed, while --mind does the same for samples
