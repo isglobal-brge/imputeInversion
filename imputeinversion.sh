@@ -8,8 +8,8 @@ set -e
 path=`dirname "${BASH_SOURCE[0]}"`
 source $path/prephasing.sh
 source $path/phasing_shapeit.sh
-source $path/minimac3_imputation.sh
-source $path/postimputation.sh
+#source $path/minimac3_imputation.sh
+#source $path/postimputation.sh
 
 ## Load config file
 source $path/config
@@ -192,7 +192,7 @@ fi
 ## Apply phasing to each chromosome
 for i in ${unique_chr[@]} # For each single chromosome 
 do
-  prephase $i $prefix $base $refsFolder $cpus $family
+  phase $i $prefix $base $refsFolder $cpus $family
 done  
 
 #. ~/data/software/imputeInversion-master/phasing_shapeit_v2.sh # Call the phasing script (keeping the variables)
