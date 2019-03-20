@@ -1,67 +1,80 @@
 #!/bin/bash
 
+#######################################
+# Impute data with minimac
+# Arguments:
+#	  $1: Chromosome to be phased
+#   $2: folder path
+#   $3: base name
+#   $4: prefix to name inversions
+#   $5: inversion start
+#   $6: inversion end
+#   $7: Path to reference folder
+#   $8: number of CPUs used in minimac
+# Returns:
+#   None
+#######################################
+impute(){
+  
+  chr=$1
+  dir=$2
+  base=$3
+  prefix=$4
+  start=$5
+  end=$6
+  pathRef=$7
+  cpus=$8
 
-mkdir pimputed_files # Folder to store all the files generated during phasing process
-
-counter=0 # Start counter (will be used for the files names, starting and ending positions for each imputation)
-for i in ${chr[@]} # For each element in 'chr' (there might be repited chromomes: more than one invresion per chromosome to be imputed)
-do
-  mkdir pimputed_files/${prefix[$counter]} # Create file with the chromosome number to store the files separated by chromosomes
-  if [[ $i == X ]] # If it is the chromosome X
+  if [ ! -d $dir/pimputed_files/$prefix ]; then
+    mkdir $dir/pimputed_files/$prefix # Create file with the chromosome number to store the files separated by chromosomes
+  fi
+  
+  if [[ $chr == X ]] # If it is the chromosome X
   then
-    sed 's/^23/X/' phased_files/${i}/${i}_${data}_filtered_phased.vcf  > phased_files/${i}/${i}_${data}_filtered_phased_X.vcf # Change number of the chromosome (it was indicated with 23, change to X)
-    awk '$5 == 2 { print $2 > "females.txt"}' ${data}.fam # Store ids of the females individuals in a text file
-    awk '$5 == 1 { print $2 > "males.txt"}' ${data}.fam # Store ids of the males individuals in a text file
+    sed 's/^23/X/' $dir/phased_files/${chr}/${chr}_${base}_filtered_phased.vcf  > $dir/phased_files/${chr}/${chr}_${chr}_filtered_phased_X.vcf # Change number of the chromosome (it was indicated with 23, change to X)
+    awk '$5 == 2 { print $2 }' < $dir/${base}.fam > $prefix/females_${base}.txt # Store ids of the females individuals in a text file
+    awk '$5 == 1 { print $2}'  < $dir/${base}.fam > $prefix/males_${base}.txt   # Store ids of the males individuals in a text file
     # Separate the data by sex using the above files. Store males individuals in a separated file
-    vcftools --vcf phased_files/${i}/${i}_${data}_filtered_phased_X.vcf \
-            --keep males.txt\
+    vcftools --vcf phased_files/${chr}/${chr}_${base}_filtered_phased_X.vcf \
+            --keep $prefix/males_${base}.txt  \
             --recode \
-            --out phased_files/${i}/${i}_${data}_males_filtered_phased_X
+            --out $prefix/phased_files/${chr}/${chr}_${base}_males_filtered_phased_X
     # Store females in another vcf file
-    vcftools --vcf phased_files/${i}/${i}_${data}_filtered_phased_X.vcf \
-            --keep females.txt\
+    vcftools --vcf phased_files/${chr}/${chr}_${base}_filtered_phased_X.vcf \
+            --keep $prefix/females_${base}.txt \
             --recode \
-            --out phased_files/${i}/${i}_${data}_females_filtered_phased_X
+            --out $prefix/phased_files/${chr}/${i}_${base}_females_filtered_phased_X
     # Impute the inversion region of the chromosome X (indicating by --start and --end) for the males
-    Minimac3-omp --refHaps ~/data/PublicData/REFERENCES/reference_panels/ALL.chrX.Non.Pseudo.Auto.phase3_v5.shapeit2_mvncall_integrated.noSingleton.genotypes.vcf.gz \
-            --haps phased_files/${i}/${i}_${data}_males_filtered_phased_X.recode.vcf \
+    Minimac3-omp --refHaps $pathRef/ALL.chrX.Non.Pseudo.Auto.phase3_v5.shapeit2_mvncall_integrated.noSingleton.genotypes.vcf.gz \
+            --haps $prefix/phased_files/${chr}/${chr}_${base}_males_filtered_phased_X.recode.vcf \
             --rsid \
-            --format GT,DS,GP \
+            --format GT,GP \
             --chr X \
-            --start ${start[$counter]} \
-            --end ${end[$counter]} \
-            --prefix pimputed_files/${prefix[$counter]}/${prefix[$counter]}_${data}_males_imputed \
+            --start $start \
+            --end $end \
+            --prefix $prefix/pimputed_files/$prefix/$prefix_${base}_males_imputed \
             --cpus $cpus
     # Impute the inversion region of the chromosome X (indicated by --start and --end) for the females
-    Minimac3-omp --refHaps ~/data/PublicData/REFERENCES/reference_panels/ALL.chrX.Non.Pseudo.Auto.phase3_v5.shapeit2_mvncall_integrated.noSingleton.genotypes.vcf.gz \
-            --haps phased_files/${i}/${i}_${data}_females_filtered_phased_X.recode.vcf \
+    Minimac3-omp --refHaps $pathRef/ALL.chrX.Non.Pseudo.Auto.phase3_v5.shapeit2_mvncall_integrated.noSingleton.genotypes.vcf.gz \
+            --haps phased_files/${chr}/${chr}_${base}_females_filtered_phased_X.recode.vcf \
             --rsid \
-            --format GT,DS,GP \
+            --format GT,GP \
             --chr X \
-            --start ${start[$counter]} \
-            --end ${end[$counter]} \
-            --prefix pimputed_files/${prefix[$counter]}/${prefix[$counter]}_${data}_females_imputed \
+            --start $start \
+            --end $end \
+            --prefix $prefix/pimputed_files/$prefix/$prefix_${base}_females_imputed \
             --cpus $cpus
           
   else # For the rest of the chromosomes
     # Impute the inversion region (indicated by --start and --end)
-    Minimac3-omp --refHaps ~/data/PublicData/REFERENCES/reference_panels/ALL.chr${i}.phase3_v5.shapeit2_mvncall_integrated.noSingleton.genotypes.vcf.gz \
-            --haps phased_files/${i}/${i}_${data}_filtered_phased.vcf \
+    Minimac3-omp --refHaps $pathRef/ALL.chr${chr}.phase3_v5.shapeit2_mvncall_integrated.noSingleton.genotypes.vcf.gz \
+            --haps $prefix/phased_files/${chr}/${chr}_${base}_filtered_phased.vcf \
             --rsid \
-            --format GT,DS,GP \
-            --chr $i \
-            --start ${start[$counter]} \
-            --end ${end[$counter]} \
-            --prefix pimputed_files/${prefix[$counter]}/${prefix[$counter]}_${data}_imputed \
+            --format GT,GP \
+            --chr $chr \
+            --start $start \
+            --end $end \
+            --prefix $prefix/pimputed_files/$prefix/$prefix_${base}_imputed \
             --cpus $cpus
   fi    
-  counter=$counter+1
-done  
-
-# By default, the intermediate files will be deleted
-if [[ -z "$keep_files" ]] || [[ $keep_files != Yes ]] && [[ $keep_files != YES ]] && [[ $keep_files != yes ]] # If user did not indicate 'YES' to keep the intermediate files
-then
-  rm -rf phased_files # Remove folder containing phased files 
-fi
-
-. postimputation.sh # Call imputation script (keeping the variables)
+}

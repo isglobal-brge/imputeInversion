@@ -8,7 +8,7 @@ set -e
 path=`dirname "${BASH_SOURCE[0]}"`
 source $path/prephasing.sh
 source $path/phasing_shapeit.sh
-#source $path/minimac3_imputation.sh
+source $path/minimac3_imputation.sh
 #source $path/postimputation.sh
 
 ## Load config file
@@ -179,21 +179,39 @@ then
 fi
 echo -e "Prephasing starting\n\n"
 
-prefix=`dirname $data`
+dir=`dirname $data`
 base=`basename $data`
 
 prephase $data $unique_chr $HRCref 
 
 echo "Start phasing"
-if [ ! -d $prefix/phased_files ]; then
-  mkdir $prefix/phased_files # Folder to store all the files generated during phasing process
+if [ ! -d $dir/phased_files ]; then
+  mkdir $dir/phased_files # Folder to store all the files generated during phasing process
 fi 
 
 ## Apply phasing to each chromosome
 for i in ${unique_chr[@]} # For each single chromosome 
 do
-  phase $i $prefix $base $refsFolder $cpus $family
+  phase $i $dir $base $refsFolder $cpus $family
 done  
+
+if [ ! -d $dir/phased_files/shapeit ]; then
+  mkdir $dir/phased_files/shapeit #to store all shapeit intermediate files
+fi
+
+mv $dir/phased_files/shapeit_* $dir/phased_files/shapeit/
+
+if [ ! -d $dir/pimputed_files ]; then
+  mkdir $dir/pimputed_files # Folder to store all the files generated during phasing process
+fi
+
+## Apply imputation and post-imputation to each inversion
+counter=0 # Start counter (will be used for the files names, starting and ending positions for each imputation)
+for i in ${chr[@]}
+do
+  impute $i $dir $base ${prefix[$counter]} ${start[$counter]} ${end[$counter]} $refsFolder $cpus
+  postimputation
+done
 
 #. ~/data/software/imputeInversion-master/phasing_shapeit_v2.sh # Call the phasing script (keeping the variables)
 #. ~/data/software/imputeInversion-master/minimac3_imputation_v3.sh # Call imputation script (keeping the variables)

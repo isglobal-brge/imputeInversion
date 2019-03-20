@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #######################################
-# Phase data shapeit
+# Phase data with shapeit
 # Arguments:
 #	  $1: Chromosome to be phased
 #   $2: folder path
@@ -31,11 +31,13 @@ phase(){
             -M $ShapeRef/genetic_map_chrX_nonPAR_combined_b37.txt \
             -O $prefix/phased_files/$chr/$chr_${base}_filtered_phased \
             --chrX \
-            --thread $cpus
+            --thread $cpus \
+  	       -L $prefix/phased_files/${chr}/shapeit_${chr}.log
       # Convert output files from SHAPEIT (.haps) to vcf format      
       shapeit -convert \
             --input-haps $prefix/phased_files/${chr}/${chr}_${base}_filtered_phased \
-            --output-vcf $prefix/phased_files/${chr}/${chr}_${base}_filtered_phased.vcf
+            --output-vcf $prefix/phased_files/${chr}/${chr}_${base}_filtered_phased.vcf \
+  	       -L $prefix/phased_files/${chr}/shapeit_conv_${chr}.log
     else
       # Run SHAPEIT to phase the chromosome (no need to indicate anything else, just the input file containing a single chromosome)
       if  [[ $family == No ]] ||  [[ $family == NO ]] ||  [[ $family == no ]] #If user indicated no relatedness
@@ -43,12 +45,14 @@ phase(){
            echo -e "Performing shapeit with NO relatedness"
            shapeit -B $prefix/prephasing_files/${chr}/${chr}_${base}_filtered \
   	      -M $ShapeRef/genetic_map_chr${chr}_combined_b37.txt \
-  	      -O $prefix/phased_files/${chr}/${chr}_1Mv3_filtered_phased \
-  	      --thread $cpus
+  	      -O $prefix/phased_files/${chr}/${chr}_${base}_filtered_phased \
+  	      --thread $cpus \
+  	      -L $prefix/phased_files/${chr}/shapeit_${chr}.log
       # Convert output files from SHAPEIT (.haps) to vcf format
            shapeit -convert \
             --input-haps $prefix/phased_files/${chr}/${chr}_${base}_filtered_phased \
-            --output-vcf $prefix/phased_files/${chr}/${chr}_${base}_filtered_phased.vcf
+            --output-vcf $prefix/phased_files/${chr}/${chr}_${base}_filtered_phased.vcf \
+  	       -L $prefix/phased_files/${chr}/shapeit_conv_${chr}.log
       elif [[ $family == Yes ]] || [[ $family == YES ]] || [[ $family == yes ]]
       then
            echo -e "Performing shapeit taking into account relatedness"
@@ -59,14 +63,15 @@ phase(){
              --force \
              -O $prefix/phased_files/${chr}/${chr}_${base}_filtered_phased \
              --thread $cpus \
+  	       -L $prefix/phased_files/${chr}/shapeit_${chr}.log
            # Convert output files from SHAPEIT (.haps) to vcf format
            shapeit -convert \
              --input-haps $prefix/phased_files/${chr}/${chr}_${base}_filtered_phased \
-             --output-vcf $prefix/phased_files/${chr}/${chr}_${base}_filtered_phased.vcf 
+             --output-vcf $prefix/phased_files/${chr}/${chr}_${base}_filtered_phased.vcf \
+  	       -L $prefix/phased_files/${chr}/shapeit_conv_${chr}.log
       else
           echo -e "Shapeit stopped due to unknown family parameter"
           exit		
       fi
     fi
-    mv $prefix/shapeit_* $prefix/phased_files/ # Move shapeit .log files to the phased_files folder (to keep all the files in the same folder in case the user wants to keep the intermediate files)
 }
