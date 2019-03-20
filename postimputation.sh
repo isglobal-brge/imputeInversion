@@ -1,8 +1,5 @@
 #!/bin/bash
 
-## Stop on an error
-set -e
-
 #######################################
 # Post process impuation data
 # Arguments:
