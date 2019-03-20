@@ -174,7 +174,11 @@ then
   cpus=1 # Set to one the number of threads to be used by the program
 fi
 echo -e "Prephasing starting\n\n"
-prephase $data $unique_chr $HRCref
+
+prefix=`dirname $data`
+base=`basename $data`
+
+prephase $data $unique_chr $HRCref | tee $prefix/prephasing_$base.log; 
 . ~/data/software/imputeInversion-master/prephasing_v3.sh # Call the prephasing script to proceed with the process keeping the variables
 . ~/data/software/imputeInversion-master/phasing_shapeit_v2.sh # Call the phasing script (keeping the variables)
 . ~/data/software/imputeInversion-master/minimac3_imputation_v3.sh # Call imputation script (keeping the variables)

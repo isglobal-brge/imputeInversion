@@ -46,7 +46,7 @@ prephase(){
 	  if [[ $i == X ]] # If it is the chromosome X
 	  then
 		# Select chromosome '23' and fitler it: --geno filters out all variants with missing call rates exceeding the provided value (0.05 to avoid problems with SHAPEIT) to be removed, while --mind does the same for samples
-		plink --bfile $prefix/prephasing_files/${data}_updated \
+		plink --bfile $prefix/prephasing_files/${base}_updated \
 			--reference-allele $prefix/Force-Allele1-$base-1000G.txt \
 			--make-bed \
 			--mind 0.05 \
