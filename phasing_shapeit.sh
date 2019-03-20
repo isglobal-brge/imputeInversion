@@ -38,7 +38,7 @@ phase(){
             --output-vcf $prefix/phased_files/${chr}/${chr}_${base}_filtered_phased.vcf
     else
       # Run SHAPEIT to phase the chromosome (no need to indicate anything else, just the input file containing a single chromosome)
-      if  [[ $family == No ]] && [[ $family == NO ]] && [[ $family == no ]] #If user indicated no relatedness
+      if  [[ $family == No ]] ||  [[ $family == NO ]] ||  [[ $family == no ]] #If user indicated no relatedness
       then
            echo -e "Performing shapeit with NO relatedness"
            shapeit -B $prefix/prephasing_files/${chr}/${chr}_${base}_filtered \
