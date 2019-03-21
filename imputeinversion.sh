@@ -68,11 +68,6 @@ case $key in
     usage
     shift # past argument
     ;;
-    --prefix)
-    prefix="$2"
-    shift # past argument
-    shift # past value
-    ;;
 esac
 done
 
