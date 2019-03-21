@@ -43,7 +43,7 @@ impute(){
     vcftools --vcf $dir/phased_files/${chr}/${chr}_${base}_filtered_phased_X.vcf \
             --keep $dir/females_${base}.txt \
             --recode \
-            --out $prefix/phased_files/${chr}/${i}_${base}_females_filtered_phased_X
+            --out $dir/phased_files/${chr}/${i}_${base}_females_filtered_phased_X
     # Impute the inversion region of the chromosome X (indicating by --start and --end) for the males
     Minimac3-omp --refHaps $pathRef/ALL.chrX.Non.Pseudo.Auto.phase3_v5.shapeit2_mvncall_integrated.noSingleton.genotypes.vcf.gz \
             --haps $dir/phased_files/${chr}/${chr}_${base}_males_filtered_phased_X.recode.vcf \
@@ -52,7 +52,7 @@ impute(){
             --chr X \
             --start $start \
             --end $end \
-            --prefix $dir/pimputed_files/$prefix/$prefix_${base}_males_imputed \
+            --prefix $prefix/$prefix_${base}_males_imputed \
             --cpus $cpus
     # Impute the inversion region of the chromosome X (indicated by --start and --end) for the females
     Minimac3-omp --refHaps $pathRef/ALL.chrX.Non.Pseudo.Auto.phase3_v5.shapeit2_mvncall_integrated.noSingleton.genotypes.vcf.gz \
@@ -62,7 +62,7 @@ impute(){
             --chr X \
             --start $start \
             --end $end \
-            --prefix $dir/pimputed_files/$prefix/$prefix_${base}_females_imputed \
+            --prefix $prefix_${base}_females_imputed \
             --cpus $cpus
           
   else # For the rest of the chromosomes
@@ -74,7 +74,9 @@ impute(){
             --chr $chr \
             --start $start \
             --end $end \
-            --prefix $dir/pimputed_files/$prefix/$prefix_${base}_imputed \
+            --prefix $prefix_${base}_imputed \
             --cpus $cpus
   fi    
+ 
+  mv $base* $dir/pimputed_files/$prefix/
 }

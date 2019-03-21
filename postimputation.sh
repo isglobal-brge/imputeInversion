@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #######################################
-# Post process impuation data
+# Post process imputation data
 # Arguments:
 #	  $1: Chromosome to be phased
 #   $2: folder path
@@ -21,11 +21,11 @@ postimpute(){
   cpus=$5
   ref=$6
 
-  if [ ! -d $dir/postimputation_files/$prefix]; then
+  if [ ! -d $dir/postimputation_files/$prefix ]; then
     mkdir $dir/postimputation_files/$prefix # Create file with the chromosome number to store the files separated by chromosomes
   fi
   
-  if [ ! -d $dir/${base}_imputed_files/$prefix ];
+  if [ ! -d $dir/${base}_imputed_files/$prefix ]; then
     mkdir $dir/${base}_imputed_files/$prefix
   fi
   
@@ -57,7 +57,7 @@ postimpute(){
     
   else # For the rest of the chromosomes
     #only to be executed in case the file exists
-    if [ -f $dir/pimputed_files/$prefix/$prefix_${base}_imputed.dose.vcf.gz]
+    if [ -f $dir/pimputed_files/$prefix/$prefix_${base}_imputed.dose.vcf.gz ]
     then
         # Compress the imputed files with bgzip to avoid problems using bcftools afterwards
         zcat $dir/pimputed_files/$prefix/$prefix_${base}_imputed.dose.vcf.gz | bgzip -c > $dir/postimputation_files/$prefix/$prefix_${base}_imputed_bgzip.vcf.gz && tabix $dir/postimputation_files/$prefix/$prefix_${base}_imputed_bgzip.vcf.gz    
