@@ -1,5 +1,5 @@
 ## Paths to reference files
 refsFolder=$HOME/PublicData/REFERENCES/reference_panels
 HRCref=$refsFolder/1000GP_Phase3_combined.legend.imputeInversion
-annotRef=$refsFolder/All_20180418.vcf.gz
+annotRef=$refsFolder/imputeInversionAnnotRef.vcf.gz
 minimacRefs=$refsFolder/imputeInversionRefsMinimac
