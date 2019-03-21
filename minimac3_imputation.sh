@@ -45,36 +45,36 @@ impute(){
             --recode \
             --out $dir/phased_files/${chr}/${i}_${base}_females_filtered_phased_X
     # Impute the inversion region of the chromosome X (indicating by --start and --end) for the males
-    Minimac3-omp --refHaps $pathRef/ALL.chrX.Non.Pseudo.Auto.phase3_v5.shapeit2_mvncall_integrated.noSingleton.genotypes.vcf.gz \
+    Minimac3-omp --refHaps $pathRef/invX_006.vcf.gz \
             --haps $dir/phased_files/${chr}/${chr}_${base}_males_filtered_phased_X.recode.vcf \
             --rsid \
             --format GT,GP \
             --chr X \
             --start $start \
             --end $end \
-            --prefix $prefix/$prefix_${base}_males_imputed \
+            --prefix $prefix/${prefix}_${base}_males_imputed \
             --cpus $cpus
     # Impute the inversion region of the chromosome X (indicated by --start and --end) for the females
-    Minimac3-omp --refHaps $pathRef/ALL.chrX.Non.Pseudo.Auto.phase3_v5.shapeit2_mvncall_integrated.noSingleton.genotypes.vcf.gz \
+    Minimac3-omp --refHaps $pathRef/invX_006.vcf.gz \
             --haps $dir/phased_files/${chr}/${chr}_${base}_females_filtered_phased_X.recode.vcf \
             --rsid \
             --format GT,GP \
             --chr X \
             --start $start \
             --end $end \
-            --prefix $prefix_${base}_females_imputed \
+            --prefix ${prefix}_${base}_females_imputed \
             --cpus $cpus
           
   else # For the rest of the chromosomes
     # Impute the inversion region (indicated by --start and --end)
-    Minimac3-omp --refHaps $pathRef/ALL.chr${chr}.phase3_v5.shapeit2_mvncall_integrated.noSingleton.genotypes.vcf.gz \
+    Minimac3-omp --refHaps $pathRef/${prefix}.vcf.gz \
             --haps $dir/phased_files/${chr}/${chr}_${base}_filtered_phased.vcf \
             --rsid \
             --format GT,GP \
             --chr $chr \
             --start $start \
             --end $end \
-            --prefix $prefix_${base}_imputed \
+            --prefix ${prefix}_${base}_imputed \
             --cpus $cpus
   fi    
  

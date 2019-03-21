@@ -212,7 +212,7 @@ counter=0 # Start counter (will be used for the files names, starting and ending
 for i in ${chr[@]}
 do
   impute $i $dir $base ${prefix[$counter]} ${start[$counter]} ${end[$counter]} $refsFolder $cpus
-  postimpute $i $dir $base ${prefix[$counter]} $cpus $annotRef
+  postimpute $i $dir $base ${prefix[$counter]} $cpus $minimacRefs
 done
 
 # By default, the intermediate files will be deleted
