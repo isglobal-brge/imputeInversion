@@ -178,6 +178,9 @@ echo -e "Prephasing starting\n\n"
 dir=`dirname $data`
 base=`basename $data`
 
+
+counter=0
+echo ${prefix[$counter]}
 prephase $data $unique_chr $HRCref 
 
 echo "Start phasing"
@@ -211,8 +214,9 @@ fi
 counter=0 # Start counter (will be used for the files names, starting and ending positions for each imputation)
 for i in ${chr[@]}
 do
-  impute $i $dir $base ${prefix[$counter]} ${start[$counter]} ${end[$counter]} $refsFolder $cpus
-  postimpute $i $dir $base ${prefix[$counter]} $cpus $minimacRefs
+  impute $i $dir $base ${prefix[$counter]} ${start[$counter]} ${end[$counter]} $minimacRefs $cpus
+  postimpute $i $dir $base ${prefix[$counter]} $cpus $annotRef
+  counter=$((counter+1))
 done
 
 # By default, the intermediate files will be deleted

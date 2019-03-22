@@ -27,9 +27,9 @@ phase(){
   if [[ $chr == X ]] # If it is the chromosome X
     then
       # Run SHAPEIT to phase chromosome X (specifying the '--chrX' flag). SHAPEIT will phase female individuals and will set NA to haploid heterozygous males
-      shapeit -B $prefix/prephasing_files/$chr/$chr_${base}_filtered \
+      shapeit -B $prefix/prephasing_files/$chr/${chr}_${base}_filtered \
             -M $ShapeRef/genetic_map_chrX_nonPAR_combined_b37.txt \
-            -O $prefix/phased_files/$chr/$chr_${base}_filtered_phased \
+            -O $prefix/phased_files/$chr/${chr}_${base}_filtered_phased \
             --chrX \
             --thread $cpus \
   	       -L $prefix/phased_files/${chr}/shapeit_${chr}.log

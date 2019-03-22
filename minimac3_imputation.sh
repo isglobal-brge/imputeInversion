@@ -78,5 +78,5 @@ impute(){
             --cpus $cpus
   fi    
  
-  mv $base* $dir/pimputed_files/$prefix/
+  mv ${prefix}_$base* $dir/pimputed_files/$prefix/
 }
