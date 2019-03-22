@@ -212,18 +212,30 @@ fi
 
 ## Apply imputation and post-imputation to each inversion
 counter=0 # Start counter (will be used for the files names, starting and ending positions for each imputation)
+g=0
 for i in ${chr[@]}
 do
   impute $i $dir $base ${prefix[$counter]} ${start[$counter]} ${end[$counter]} $minimacRefs $cpus
-  postimpute $i $dir $base ${prefix[$counter]} $cpus $annotRef
+  if [[ $? == 0]]; then ## If inversion worked, marked
+    postimpute $i $dir $base ${prefix[$counter]} $cpus $annotRef
+    if [[ $? == 0]]; then ## If inversion worked, marked
+      g=(($g + 1))
+    else
+      ${prefix[$counter]} >> $prefix/${base}.badInvs.log
+    fi
+  else
+    ${prefix[$counter]} >> $prefix/${base}.badInvs.log
+  fi
   counter=$((counter+1))
 done
 
-# By default, the intermediate files will be deleted
-if [[ -z "$keep_files" ]] || [[ $keep_files != Yes ]] && [[ $keep_files != YES ]] && [[ $keep_files != yes ]] # If user did not indicate 'YES' to keep the intermediate files 
-then
-  rm -rf $dir/prephasing_files # Remove folder containing pre-phasing files (remove files at this point to avoid having to many files at the end of the process if we want to impute all the chromosomes and cause potential memory problems) 
-  rm -rf $dir/phased_files # Remove folder containing phased files 
-  rm -rf $dir/pimputed_files # Remove folder containing imputed files
-  rm -rf $dir/postimputation_files # Remove folder containing postimputed files (intermediate files between the imputed ones and the final ones with the correct ids)
+if [[ $g == ${#chr[@]} ]]; then 
+  # By default, the intermediate files will be deleted if all inversion worked
+  if [[ -z "$keep_files" ]] || [[ $keep_files != Yes ]] && [[ $keep_files != YES ]] && [[ $keep_files != yes ]] # If user did not indicate 'YES' to keep the intermediate files 
+  then
+    rm -rf $dir/prephasing_files # Remove folder containing pre-phasing files (remove files at this point to avoid having to many files at the end of the process if we want to impute all the chromosomes and cause potential memory problems) 
+    rm -rf $dir/phased_files # Remove folder containing phased files 
+    rm -rf $dir/pimputed_files # Remove folder containing imputed files
+    rm -rf $dir/postimputation_files # Remove folder containing postimputed files (intermediate files between the imputed ones and the final ones with the correct ids)
+  fi
 fi
