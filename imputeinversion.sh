@@ -187,6 +187,7 @@ if [ ! -d $dir/phased_files ]; then
   mkdir $dir/phased_files # Folder to store all the files generated during phasing process
 fi 
 
+
 ## Apply phasing to each chromosome
 for i in ${unique_chr[@]} # For each single chromosome 
 do
@@ -209,6 +210,8 @@ if [ ! -d $dir/${base}_imputed_files ]; then
   mkdir $dir/${base}_imputed_files # Folder to store the final files (this one will NOT be removed)
 fi
 
+
+
 ## Apply imputation and post-imputation to each inversion
 counter=0 # Start counter (will be used for the files names, starting and ending positions for each imputation)
 g=0
@@ -220,10 +223,10 @@ do
     if [[ $? == 0 ]]; then ## If inversion worked, marked
       g=$(($g + 1))
     else
-      echo "postimpute ${prefix[$counter]}" >> $prefix/${base}.badInvs.log
+      echo "postimpute ${prefix[$counter]}" >> $dir/${base}.badInvs.log
     fi
   else
-    echo "impute ${prefix[$counter]}" >> $prefix/${base}.badInvs.log
+    echo "impute ${prefix[$counter]}" >> $dir/${base}.badInvs.log
   fi
   counter=$(($counter+1))
 done

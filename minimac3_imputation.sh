@@ -31,32 +31,32 @@ impute(){
   
   if [[ $chr == X ]] # If it is the chromosome X
   then
-    sed 's/^23/X/' $dir/phased_files/${chr}/${chr}_${base}_filtered_phased.vcf  > $dir/phased_files/${chr}/${chr}_${chr}_filtered_phased_X.vcf # Change number of the chromosome (it was indicated with 23, change to X)
+    sed 's/^23/X/' $dir/phased_files/${chr}/${chr}_${base}_filtered_phased.vcf  > $dir/phased_files/${chr}/${chr}_${base}_filtered_phased_X.vcf # Change number of the chromosome (it was indicated with 23, change to X)
     awk '$5 == 2 { print $2 }' < $dir/${base}.fam > $dir/females_${base}.txt # Store ids of the females individuals in a text file
     awk '$5 == 1 { print $2}'  < $dir/${base}.fam > $dir/males_${base}.txt   # Store ids of the males individuals in a text file
     # Separate the data by sex using the above files. Store males individuals in a separated file
     vcftools --vcf $dir/phased_files/${chr}/${chr}_${base}_filtered_phased_X.vcf \
             --keep $dir/males_${base}.txt  \
             --recode \
-            --out $dir/phased_files/${chr}/${chr}_${base}_males_filtered_phased_X
+            --out $dir/phased_files/${chr}/${chr}_${base}_males_filtered_phased
     # Store females in another vcf file
     vcftools --vcf $dir/phased_files/${chr}/${chr}_${base}_filtered_phased_X.vcf \
             --keep $dir/females_${base}.txt \
             --recode \
-            --out $dir/phased_files/${chr}/${i}_${base}_females_filtered_phased_X
+            --out $dir/phased_files/${chr}/${i}_${base}_females_filtered_phased
     # Impute the inversion region of the chromosome X (indicating by --start and --end) for the males
     Minimac3-omp --refHaps $pathRef/invX_006.vcf.gz \
-            --haps $dir/phased_files/${chr}/${chr}_${base}_males_filtered_phased_X.recode.vcf \
+            --haps $dir/phased_files/${chr}/${chr}_${base}_males_filtered_phased.recode.vcf \
             --rsid \
             --format GT,GP \
             --chr X \
             --start $start \
             --end $end \
-            --prefix $prefix/${prefix}_${base}_males_imputed \
+            --prefix ${prefix}_${base}_males_imputed \
             --cpus $cpus
     # Impute the inversion region of the chromosome X (indicated by --start and --end) for the females
     Minimac3-omp --refHaps $pathRef/invX_006.vcf.gz \
-            --haps $dir/phased_files/${chr}/${chr}_${base}_females_filtered_phased_X.recode.vcf \
+            --haps $dir/phased_files/${chr}/${chr}_${base}_females_filtered_phased.recode.vcf \
             --rsid \
             --format GT,GP \
             --chr X \
@@ -78,5 +78,5 @@ impute(){
             --cpus $cpus
   fi    
  
-  mv ${prefix}_$base* $dir/pimputed_files/$prefix/
+  mv ${prefix}_${base}* $dir/pimputed_files/$prefix/
 }

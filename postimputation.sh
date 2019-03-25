@@ -47,14 +47,12 @@ postimpute(){
     # Add lines to the header conatining information about ID=GENOTYPED (avoid problems in the next steps)
     sed -i '/^##FORMAT=<ID=GT/i ##FILTER=<ID=GENOTYPED,Description="Marker was genotyped AND imputed">\n##FILTER=<ID=GENOTYPED_ONLY,Description="Marker was genotyped but NOT imputed">' $dir/postimputation_files/hdrfemales.txt
     # Create a temporal file with the new header and the data from the imputed file
-    bcftools reheader -h $dir/postimputation_files/hdrfemales.txt --output $dir/postimputation_files/$prefix/${prefix}_${base}_females_hdr_imputed_bgzip.vcf.gz postimputation_files/$prefix/${prefix}_${base}_females_imputed_bgzip.vcf.gz
+    bcftools reheader -h $dir/postimputation_files/hdrfemales.txt --output $dir/postimputation_files/$prefix/${prefix}_${base}_females_hdr_imputed_bgzip.vcf.gz $dir/postimputation_files/$prefix/${prefix}_${base}_females_imputed_bgzip.vcf.gz
     tabix -p vcf $dir/postimputation_files/$prefix/${prefix}_${base}_females_hdr_imputed_bgzip.vcf.gz
     # Merge files containing the female and the male individuals 
     bcftools merge --force-samples --output-type z --output $dir/postimputation_files/TEMP1.vcf.gz $dir/postimputation_files/$prefix/${prefix}_${base}_males_hdr_imputed_bgzip.vcf.gz $dir/postimputation_files/$prefix/${prefix}_${base}_females_hdr_imputed_bgzip.vcf.gz
     tabix -p vcf $dir/postimputation_files/TEMP1.vcf.gz
-    rm $dir/postimputation_files/TEMP* # Remove temporal files created during the process
-    rm $dir/postimputation_files/hdr* # Remove files containing the headers
-    
+        
   else # For the rest of the chromosomes
     #only to be executed in case the file exists
     if [ -f $dir/pimputed_files/$prefix/${prefix}_${base}_imputed.dose.vcf.gz ]
