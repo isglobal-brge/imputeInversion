@@ -179,8 +179,7 @@ dir=`dirname $data`
 base=`basename $data`
 
 
-counter=0
-echo ${prefix[$counter]}
+## Run prephasing in all Chromosomes
 prephase $data $unique_chr $HRCref 
 
 echo "Start phasing"
@@ -216,17 +215,17 @@ g=0
 for i in ${chr[@]}
 do
   impute $i $dir $base ${prefix[$counter]} ${start[$counter]} ${end[$counter]} $minimacRefs $cpus
-  if [[ $? == 0]]; then ## If inversion worked, marked
+  if [[ $? == 0 ]]; then ## If inversion worked, marked
     postimpute $i $dir $base ${prefix[$counter]} $cpus $annotRef
-    if [[ $? == 0]]; then ## If inversion worked, marked
-      g=(($g + 1))
+    if [[ $? == 0 ]]; then ## If inversion worked, marked
+      g=$(($g + 1))
     else
-      ${prefix[$counter]} >> $prefix/${base}.badInvs.log
+      echo "postimpute ${prefix[$counter]}" >> $prefix/${base}.badInvs.log
     fi
   else
-    ${prefix[$counter]} >> $prefix/${base}.badInvs.log
+    echo "impute ${prefix[$counter]}" >> $prefix/${base}.badInvs.log
   fi
-  counter=$((counter+1))
+  counter=$(($counter+1))
 done
 
 if [[ $g == ${#chr[@]} ]]; then 
