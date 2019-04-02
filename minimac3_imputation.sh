@@ -14,16 +14,16 @@
 # Returns:
 #   None
 #######################################
-impute(){
+function impute(){
   
-  chr=$1
-  dir=$2
-  base=$3
-  prefix=$4
-  start=$5
-  end=$6
-  pathRef=$7
-  cpus=$8
+  local chr=$1
+  local dir=$2
+  local base=$3
+  local prefix=$4
+  local start=$5
+  local end=$6
+  local pathRef=$7
+  local cpus=$8
 
   if [ ! -d $dir/pimputed_files/$prefix ]; then
     mkdir $dir/pimputed_files/$prefix # Create file with the chromosome number to store the files separated by chromosomes

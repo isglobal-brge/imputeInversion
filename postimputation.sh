@@ -13,13 +13,13 @@
 #   None
 #######################################
 
-postimpute(){
-  chr=$1
-  dir=$2
-  base=$3
-  prefix=$4
-  cpus=$5
-  ref=$6
+function postimpute(){
+  local chr=$1
+  local dir=$2
+  local base=$3
+  local prefix=$4
+  local cpus=$5
+  local ref=$6
 
   if [ ! -d $dir/postimputation_files/$prefix ]; then
     mkdir $dir/postimputation_files/$prefix # Create file with the chromosome number to store the files separated by chromosomes

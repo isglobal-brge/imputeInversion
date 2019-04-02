@@ -12,14 +12,14 @@
 # Returns:
 #   None
 #######################################
-phase(){
+function phase(){
   
-  chr=$1
-  dir=$2
-  base=$3
-  ShapeRef=$4
-  cpus=$5
-  family=$6
+  local chr=$1
+  local dir=$2
+  local base=$3
+  local ShapeRef=$4
+  local cpus=$5
+  local family=$6
   
   if [ ! -d $dir/phased_files/$chr ]; then
     mkdir $dir/phased_files/$chr # Create file with the chromosome number to store the files separated by chromosomes

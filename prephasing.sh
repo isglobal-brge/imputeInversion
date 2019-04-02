@@ -9,15 +9,15 @@
 # Returns:
 #   None
 #######################################
-prephase(){
+function prephase(){
 	
-	data=$1
-	unique_chr=$2
-	ref=`echo $3`
+	local data=$1
+	local unique_chr=$2
+	local ref=`echo $3`
 	
-	dir=`dirname $data`
-	base=`basename $data`
-	path=`dirname "${BASH_SOURCE[0]}"`
+	local dir=`dirname $data`
+	local base=`basename $data`
+	local path=`dirname "${BASH_SOURCE[0]}"`
 
 	
 	## Create files for imputation (Imputation preparation)
