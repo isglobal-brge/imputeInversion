@@ -187,7 +187,6 @@ if [ ! -d $dir/phased_files ]; then
   mkdir $dir/phased_files # Folder to store all the files generated during phasing process
 fi 
 
-
 ## Apply phasing to each chromosome
 for i in ${unique_chr[@]} # For each single chromosome 
 do
@@ -215,6 +214,8 @@ fi
 ## Apply imputation and post-imputation to each inversion
 counter=0 # Start counter (will be used for the files names, starting and ending positions for each imputation)
 g=0
+nchr=${#chr[@]}
+
 for i in ${chr[@]}
 do
   impute $i $dir $base ${prefix[$counter]} ${start[$counter]} ${end[$counter]} $minimacRefs $cpus
@@ -231,7 +232,7 @@ do
   counter=$(($counter+1))
 done
 
-if [[ $g == ${#chr[@]} ]]; then 
+if [[ $g == $nchr ]]; then 
   # By default, the intermediate files will be deleted if all inversion worked
   if [[ -z "$keep_files" ]] || [[ $keep_files != Yes ]] && [[ $keep_files != YES ]] && [[ $keep_files != yes ]] # If user did not indicate 'YES' to keep the intermediate files 
   then
