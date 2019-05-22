@@ -38,5 +38,9 @@ done < $invRanges
 ## Inversion X
 bcftools view -r X:71715927-72806774 ALL.chrX.Non.Pseudo.Auto.phase3_v5.shapeit2_mvncall_integrated.noSingleton.genotypes.vcf.gz -o imputeInversionRefsMinimac/invX_006.vcf.gz -O z 
 
+## Inversion 10
+bcftools view -r 10:26720925-28156433 ALL.chr10.phase3_v5.shapeit2_mvncall_integrated.noSingleton.genotypes.vcf.gz -o imputeInversionRefsMinimac/inv10_005.vcf.gz -O z 
+
+
 ## Annotation References
 bcftools view -r `cut -d' ' -f2 $invRanges | paste -d, -s` All_20180418.vcf.gz -o imputeInversionAnnotRef.vcf.gz -O z 
