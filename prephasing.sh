@@ -12,14 +12,13 @@
 function prephase(){
 	
 	local data=$1
-	local unique_chr=$2
+	unique_chr=$2
 	local ref=`echo $3`
 	
 	local dir=`dirname $data`
 	local base=`basename $data`
 	local path=`dirname "${BASH_SOURCE[0]}"`
 
-	
 	## Create files for imputation (Imputation preparation)
 	if [ ! -d $dir/prephasing_files ]; then
 		mkdir $dir/prephasing_files # Folder to store all the files generated during pre-phasing process
