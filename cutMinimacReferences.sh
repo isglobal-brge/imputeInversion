@@ -4,6 +4,8 @@
 #'#################################################################################
 #'#################################################################################
 
+## URL to download: ftp://share.sph.umich.edu/minimac3/G1K_P3_VCF_Files.tar.gz
+
 ## Run in ~/PublicData/REFERENCES/reference_panels
 mkdir imputeInversionRefsMinimac
 

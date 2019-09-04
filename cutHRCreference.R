@@ -4,6 +4,8 @@
 #'#################################################################################
 #'#################################################################################
 
+## URL to download: https://www.well.ox.ac.uk/~wrayner/tools/1000GP_Phase3_combined.legend.gz
+
 library(data.table)
 library(GenomicRanges)
 library(scoreInvHap)
