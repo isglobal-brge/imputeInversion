@@ -5,7 +5,7 @@
 #'#################################################################################
 
 ## URL to download: ftp://share.sph.umich.edu/minimac3/G1K_P3_VCF_Files.tar.gz
-
+## URL to download: ftp://ftp.ncbi.nih.gov/snp/organisms/human_9606_b151_GRCh38p7/VCF/All_20180418.vcf.gz
 ## Run in ~/PublicData/REFERENCES/reference_panels
 mkdir imputeInversionRefsMinimac
 
